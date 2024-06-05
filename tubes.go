@@ -53,9 +53,10 @@ type Student struct {
 	nama         string
 	nim          string
 	jawabanTugas [nmax]string
-	nilaiTugas   [nmax]int
+	nilaiJawaban [nmax]int
 	quizJawaban  [nmax]string
 	nilaiQuiz    int
+	nilaiTugas   int
 }
 
 type tabStudent [nmax]Student
@@ -173,7 +174,7 @@ func menuGuru(scanner *bufio.Scanner, countMateri, countQuiz, countTugas, countF
 			case 4:
 				forumGuru(scanner, &*countForm)
 			case 5:
-				lihatDataSiswa(*countStudent)
+				DataSiswa(*countStudent, *countTugas)
 			case 6:
 				tampilJumlahSiswaPerMateriTugas(*countMateri, *countTugas, *countStudent)
 			}
@@ -455,7 +456,7 @@ func tugasGuru(scanner *bufio.Scanner, countTugas *int, countStudent int) {
 				fmt.Println("Tugas tidak ditemukan.")
 			}
 		case 4:
-			lihatJawabanTugas(scanner, countStudent)
+			lihatJawabanTugas(scanner, countStudent, *countTugas)
 		}
 
 	}
@@ -754,13 +755,9 @@ func tugasMurid(scanner *bufio.Scanner, countTugas int, countStudent int) {
 		fmt.Println("Masukkan jawaban Anda:")
 		if scanner.Scan() {
 			jawaban := scanner.Text()
-			for i := 0; i < nmax; i++ {
-				if currentStudent.jawabanTugas[i] == "" {
-					tabelStudent[countStudent-1].jawabanTugas[i] = jawaban
-					return
-				}
-			}
+			tabelStudent[countStudent-1].jawabanTugas[nomorTugas-1] = jawaban
 			fmt.Println("Jawaban Anda telah disimpan.")
+			return
 		}
 	} else {
 		fmt.Println("Nomor tugas tidak valid.")
@@ -786,7 +783,8 @@ func quizMurid(scanner *bufio.Scanner, countQuiz int, countStudent int) {
 		}
 	}
 	tabelStudent[countStudent-1].nilaiQuiz = currentStudent.nilaiQuiz * 100 / countQuiz
-	fmt.Printf("Nilai Quiz Anda: %d\n", currentStudent.nilaiQuiz*100/countQuiz)
+	currentStudent.nilaiQuiz = 0
+	fmt.Printf("Nilai Quiz Anda: %d\n", tabelStudent[countStudent-1].nilaiQuiz)
 }
 
 func forumMurid(scanner *bufio.Scanner, countForum *int) {
@@ -850,42 +848,53 @@ func tampilkanForum(countForm int) {
 	}
 }
 
-func tampilDataSiswa(countStudent int) {
+func tampilDataSiswa(countStudent int, countTugas int) {
 	fmt.Println("Data Siswa:")
 	for i := 0; i < countStudent; i++ {
 		fmt.Printf("Nama: %s, NIM: %s, Nilai Quiz: %d\n", tabelStudent[i].nama, tabelStudent[i].nim, tabelStudent[i].nilaiQuiz)
-		for j := 0; j < nmax; j++ {
-			if tabelStudent[i].nilaiTugas[j] != 0 {
-				fmt.Printf("Nilai Tugas %d: %d\n", j+1, tabelStudent[i].nilaiTugas[j])
+		fmt.Printf("Nilai Tugas: %d\n", tabelStudent[i].nilaiTugas)
+	}
+}
+
+func DataSiswa(countStudent int, countTugas int) {
+	var input int
+	for {
+		fmt.Println("=========\t Pilihan Menu Guru \t=========")
+		fmt.Println("0. Keluar")
+		fmt.Println("1. Sort nilai quiz")
+		fmt.Println("2. Sort nilai tugas")
+		fmt.Println("3. Tampilkan data siswa")
+		fmt.Println("======================================")
+		fmt.Print("Pilih Menu: ")
+		fmt.Scanln(&input)
+		if input == 0 || input == 1 || input == 2 || input == 3 {
+			switch input {
+			case 0:
+				return
+			case 1:
+				sortNilaiQuiz(countStudent)
+			case 2:
+				sortNilaiTugas(countStudent)
+			case 3:
+				tampilDataSiswa(countStudent, countTugas)
 			}
 		}
 	}
 }
 
-func lihatJawabanTugas(scanner *bufio.Scanner, countStudent int) {
+func lihatJawabanTugas(scanner *bufio.Scanner, countStudent int, countTugas int) {
+	var nilai int
 	for i := 0; i < countStudent; i++ {
-		for j := 0; j < nmax; j++ {
-			if tabelStudent[i].jawabanTugas[j] != "" {
-				fmt.Printf("Nama Siswa: %s, NIM: %s\n", tabelStudent[i].nama, tabelStudent[i].nim)
-				fmt.Printf("Jawaban: %s\n", tabelStudent[i].jawabanTugas[j])
-				fmt.Println("Masukkan nilai untuk tugas ini:")
-				var nilai int
-				fmt.Scanln(&nilai)
-				tabelStudent[i].nilaiTugas[j] = nilai
-				fmt.Println("Nilai telah disimpan.")
-			}
+		for j := 0; j < countTugas; j++ {
+			fmt.Printf("Nama Siswa: %s, NIM: %s\n", tabelStudent[i].nama, tabelStudent[i].nim)
+			fmt.Printf("Jawaban: %s\n", tabelStudent[i].jawabanTugas[j])
+			fmt.Println("Masukkan nilai untuk tugas ini:")
+			fmt.Scanln(&nilai)
+			tabelStudent[i].nilaiJawaban[j] = nilai
+			tabelStudent[i].nilaiTugas += tabelStudent[i].nilaiJawaban[j]
+			fmt.Println("Nilai telah disimpan.")
 		}
-	}
-}
-
-func lihatDataSiswa(countStudent int) {
-	for i := 0; i < countStudent; i++ {
-		fmt.Printf("Nama: %s, NIM: %s, Nilai Quiz: %d\n", tabelStudent[i].nama, tabelStudent[i].nim, tabelStudent[i].nilaiQuiz)
-		for j := 0; j < nmax; j++ {
-			if tabelStudent[i].nilaiTugas[j] != 0 {
-				fmt.Printf("Nilai Tugas %d: %d\n", j+1, tabelStudent[i].nilaiTugas[j])
-			}
-		}
+		tabelStudent[i].nilaiTugas = tabelStudent[i].nilaiTugas / countTugas
 	}
 }
 
@@ -910,5 +919,123 @@ func tampilJumlahSiswaPerMateriTugas(countMateri int, countTugas int, countStude
 			}
 		}
 		fmt.Printf("Jumlah Siswa: %d\n", countSiswa)
+	}
+}
+
+func sortNilaiQuiz(countStudent int) {
+	var input int
+	for {
+		fmt.Println("=========\t Pilihan Menu Guru \t=========")
+		fmt.Println("0. Keluar")
+		fmt.Println("1. Sort ascending nilai quiz")
+		fmt.Println("2. Sort descending nilai quiz")
+		fmt.Println("======================================")
+		fmt.Print("Pilih Menu: ")
+		fmt.Scanln(&input)
+		if input == 0 || input == 1 || input == 2 {
+			switch input {
+			case 0:
+				return
+			case 1:
+				ascQuiz(countStudent)
+				fmt.Println("Berhasil di sort berdasarkan nilai quiz secara ascending!")
+			case 2:
+				descQuiz(countStudent)
+				fmt.Println("Berhasil di sort berdasarkan nilai quiz secara ascending!")
+			}
+		}
+	}
+}
+
+func sortNilaiTugas(countStudent int) {
+	var input int
+	for {
+		fmt.Println("=========\t Pilihan Menu Guru \t=========")
+		fmt.Println("0. Keluar")
+		fmt.Println("1. Sort ascending nilai tugas")
+		fmt.Println("2. Sort descending nilai tugas")
+		fmt.Println("======================================")
+		fmt.Print("Pilih Menu: ")
+		fmt.Scanln(&input)
+		if input == 0 || input == 1 || input == 2 {
+			switch input {
+			case 0:
+				return
+			case 1:
+				ascTugas(countStudent)
+				fmt.Println("Berhasil di sort berdasarkan nilai tugas secara ascending!")
+			case 2:
+				descTugas(countStudent)
+				fmt.Println("Berhasil di sort berdasarkan nilai tugas secara ascending!")
+			}
+		}
+	}
+}
+
+func ascQuiz(countStudent int) {
+	var pass, idx, i int
+	pass = 1
+	for pass <= countStudent-1 {
+		idx = pass - 1
+		i = pass
+		for i < countStudent {
+			if tabelStudent[idx].nilaiQuiz > tabelStudent[i].nilaiQuiz {
+				idx = i
+			}
+			i++
+		}
+		temp := tabelStudent[pass-1]
+		tabelStudent[pass-1] = tabelStudent[idx]
+		tabelStudent[idx] = temp
+		pass++
+	}
+}
+
+func descQuiz(countStudent int) {
+	var pass, i int
+	pass = 1
+	for pass <= countStudent-1 {
+		i = pass
+		temp := tabelStudent[pass]
+		for i > 0 && temp.nilaiQuiz > tabelStudent[i-1].nilaiQuiz {
+			tabelStudent[i] = tabelStudent[i-1]
+			i--
+		}
+		tabelStudent[i] = temp
+		pass++
+	}
+}
+
+func ascTugas(countStudent int) {
+	var pass, idx, i int
+	pass = 1
+	for pass <= countStudent-1 {
+		idx = pass - 1
+		i = pass
+		for i < countStudent {
+			if tabelStudent[idx].nilaiTugas > tabelStudent[i].nilaiTugas {
+				idx = i
+			}
+			i++
+		}
+		temp := tabelStudent[pass-1]
+		tabelStudent[pass-1] = tabelStudent[idx]
+		tabelStudent[idx] = temp
+		pass++
+	}
+}
+
+func descTugas(countStudent int) {
+	var pass, i int
+	pass = 1
+	for pass <= countStudent-1 {
+		i = pass
+		temp := tabelStudent[pass]
+		for i > 0 && temp.nilaiTugas > tabelStudent[i-1].nilaiTugas {
+			tabelStudent[i] = tabelStudent[i-1]
+			i--
+		}
+		tabelStudent[i] = temp
+		pass++
 	}
 }
