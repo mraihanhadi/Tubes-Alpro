@@ -1,0 +1,80 @@
+Matematika
+1
+Berapa hasil dari 2 + 2?
+4
+3
+2
+1
+4
+Matematika
+2
+Berapa hasil dari 5 x 5?
+10
+20
+25
+15
+25
+Matematika
+3
+Berapa hasil dari 10 - 3?
+7
+6
+8
+9
+7
+Matematika
+4
+Berapa hasil dari 12 ÷ 4?
+2
+3
+4
+5
+3
+Kimia
+5
+Apa simbol kimia untuk air?
+H2O
+CO2
+O2
+H2
+H2O
+Kimia
+6
+Apa simbol kimia untuk karbon dioksida?
+CO2
+CO
+C
+O2
+CO2
+Geografi
+7
+Apa ibu kota dari Indonesia?
+Jakarta
+Bandung
+Surabaya
+Medan
+Jakarta
+Geografi
+8
+Apa gunung tertinggi di dunia?
+Gunung Everest
+Gunung Kilimanjaro
+Gunung K2
+Gunung Denali
+Gunung Everest
+Sejarah
+9
+Siapa presiden pertama Indonesia?
+Soekarno
+Soeharto
+B.J. Habibie
+Megawati Soekarnoputri
+Soekarno
+Sejarah
+10
+Pada tahun berapa Indonesia merdeka?
+1945
+1950
+1940
+1949
+1945

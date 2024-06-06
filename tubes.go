@@ -216,7 +216,7 @@ func inMateri(filename string) int {
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Println("Gagal membaca file:", err)
+		fmt.Println(err)
 	}
 
 	return count
@@ -254,6 +254,14 @@ func hapusMateri(index *int) {
 	}
 }
 
+func tampilMateri(countMateri int) {
+	for i := 0; i < countMateri; i++ {
+		fmt.Printf("Materi %d: %s\n", i+1, tabelStudy[i].namaMatkul)
+		fmt.Printf("Bab: %s\n", tabelStudy[i].babMateri)
+		fmt.Printf("Isi: %s\n", tabelStudy[i].isiMateri)
+	}
+}
+
 func materiGuru(scanner *bufio.Scanner, countMateri *int) {
 	var input int
 	for {
@@ -262,10 +270,11 @@ func materiGuru(scanner *bufio.Scanner, countMateri *int) {
 		fmt.Println("1. Masukkan Materi")
 		fmt.Println("2. Edit Materi")
 		fmt.Println("3. Hapus Materi")
+		fmt.Println("4. Tampilkan Materi")
 		fmt.Println("======================================")
 		fmt.Print("Pilih Menu: ")
 		fmt.Scanln(&input)
-		if input == 0 || input == 1 || input == 2 || input == 3 {
+		if input == 0 || input == 1 || input == 2 || input == 3 || input == 4 {
 			switch input {
 			case 0:
 				return
@@ -316,6 +325,8 @@ func materiGuru(scanner *bufio.Scanner, countMateri *int) {
 				} else {
 					fmt.Println("Materi tidak ditemukan.")
 				}
+			case 4:
+				tampilMateri(*countMateri)
 			}
 		}
 	}
@@ -324,7 +335,7 @@ func materiGuru(scanner *bufio.Scanner, countMateri *int) {
 func inTugas(filename string) int {
 	file, err := os.Open(filename)
 	if err != nil {
-		fmt.Println("Gagal membuka file:", err)
+		fmt.Println(err)
 		return 0
 	}
 	defer file.Close()
@@ -334,30 +345,25 @@ func inTugas(filename string) int {
 
 	for scanner.Scan() {
 		if count >= nmax {
-			fmt.Println("Jumlah maksimum tugas telah tercapai.")
-			break
+			fmt.Println("Jumlah tugas sudah maksimum.")
+			return nmax
 		}
 		t := tugas{}
 		t.materiTugas = scanner.Text()
 
 		if !scanner.Scan() {
-			break
+			return count
 		}
 		t.judulTugas = scanner.Text()
 
 		if !scanner.Scan() {
-			break
+			return count
 		}
 		t.soal = scanner.Text()
 
 		tabelTugas[count] = t
 		count++
 	}
-
-	if err := scanner.Err(); err != nil {
-		fmt.Println("Gagal membaca file:", err)
-	}
-
 	return count
 }
 
@@ -384,12 +390,18 @@ func hapusTugas(index *int) {
 		for i := *index; i < nmax-1; i++ {
 			tabelTugas[i] = tabelTugas[i+1]
 		}
-		// Mengosongkan elemen terakhir
 		tabelTugas[nmax-1] = tugas{}
 		fmt.Println("Tugas berhasil dihapus.")
 		(*index)--
 	} else {
 		fmt.Println("Indeks tidak valid.")
+	}
+}
+
+func tampilTugas(countTugas int) {
+	for i := 0; i < countTugas; i++ {
+		fmt.Printf("Tugas %d: %s\n", i+1, tabelTugas[i].judulTugas)
+		fmt.Printf("Soal: %s\n", tabelTugas[i].soal)
 	}
 }
 
@@ -401,10 +413,11 @@ func tugasGuru(scanner *bufio.Scanner, countTugas *int, countStudent int) {
 	fmt.Println("2. Edit Tugas")
 	fmt.Println("3. Hapus Tugas")
 	fmt.Println("4. Nilai tugas siswa")
+	fmt.Println("5. Tampilkan Tugas")
 	fmt.Println("======================================")
 	fmt.Print("Pilih Menu: ")
 	fmt.Scanln(&input)
-	if input == 0 || input == 1 || input == 2 || input == 3 || input == 4 {
+	if input == 0 || input == 1 || input == 2 || input == 3 || input == 4 || input == 5 {
 		switch input {
 		case 0:
 			return
@@ -457,6 +470,8 @@ func tugasGuru(scanner *bufio.Scanner, countTugas *int, countStudent int) {
 			}
 		case 4:
 			lihatJawabanTugas(scanner, countStudent, *countTugas)
+		case 5:
+			tampilTugas(*countTugas)
 		}
 
 	}
@@ -481,17 +496,17 @@ func inQuiz(filename string) int {
 		q := quiz{}
 
 		if !scanner.Scan() {
-			break
+			return count
 		}
 		q.materiQuiz = scanner.Text()
 
 		if !scanner.Scan() {
-			break
+			return count
 		}
 		q.nomorSoal = count + 1
 
 		if !scanner.Scan() {
-			break
+			return count
 		}
 		q.soal = scanner.Text()
 
@@ -510,7 +525,6 @@ func inQuiz(filename string) int {
 		tabelQuiz[count] = q
 		count++
 	}
-	return count
 }
 
 func searchQuiz(materiQuiz string, nomorSoal int, n int) int {
@@ -550,6 +564,16 @@ func hapusQuiz(index *int, countQuiz *int) {
 	fmt.Println("Quiz berhasil dihapus.")
 }
 
+func tampilQuiz(countQuiz int) {
+	for i := 0; i < countQuiz; i++ {
+		fmt.Printf("Soal %d: %s\n", i+1, tabelQuiz[i].soal)
+		for j := 0; j < 4; j++ {
+			fmt.Printf("Opsi %d: %s\n", j+1, tabelQuiz[i].opsi[j])
+		}
+		fmt.Printf("Opsi Benar: %s\n", tabelQuiz[i].opsiBenar)
+	}
+}
+
 func quizGuru(scanner *bufio.Scanner, countQuiz *int) {
 	var input int
 	for {
@@ -558,7 +582,7 @@ func quizGuru(scanner *bufio.Scanner, countQuiz *int) {
 		fmt.Println("1. Masukkan Quiz")
 		fmt.Println("2. Edit Quiz")
 		fmt.Println("3. Hapus Quiz")
-		fmt.Println("4. Tampilkan Nilai Quiz")
+		fmt.Println("4. Tampilkan Quiz")
 		fmt.Println("======================================")
 		fmt.Print("Pilih Menu: ")
 		fmt.Scanln(&input)
@@ -618,6 +642,8 @@ func quizGuru(scanner *bufio.Scanner, countQuiz *int) {
 				} else {
 					fmt.Println("Quiz tidak ditemukan.")
 				}
+			case 4:
+				tampilQuiz(*countQuiz)
 			}
 		}
 	}
@@ -685,6 +711,20 @@ func hapusForum(index int, countForm *int) {
 	fmt.Println("Forum berhasil dihapus.")
 }
 
+func tampilkanForum(countForm int) {
+	if countForm == 0 {
+		fmt.Println("Tidak ada forum yang tersedia.")
+		return
+	}
+
+	for i := 0; i < countForm; i++ {
+		fmt.Printf("Forum %d:\n", i+1)
+		fmt.Printf("Judul: %s\n", tabelForm[i].Judul)
+		fmt.Printf("Komentar: %s\n", tabelForm[i].komen)
+		fmt.Println("------------------------------------")
+	}
+}
+
 func forumGuru(scanner *bufio.Scanner, countForm *int) {
 	var input int
 	for {
@@ -693,10 +733,11 @@ func forumGuru(scanner *bufio.Scanner, countForm *int) {
 		fmt.Println("1. Masukkan Forum")
 		fmt.Println("2. Edit Forum")
 		fmt.Println("3. Hapus Forum")
+		fmt.Println("4. Tampilkan Forum")
 		fmt.Println("======================================")
 		fmt.Print("Pilih Menu: ")
 		fmt.Scanln(&input)
-		if input == 0 || input == 1 || input == 2 || input == 3 {
+		if input == 0 || input == 1 || input == 2 || input == 3 || input == 4 {
 			switch input {
 			case 0:
 				return
@@ -721,17 +762,15 @@ func forumGuru(scanner *bufio.Scanner, countForm *int) {
 				if index != -1 {
 					hapusForum(index, &*countForm)
 				}
+			case 4:
+				tampilkanForum(*countForm)
 			}
 		}
 	}
 }
 
 func materiMurid(scanner *bufio.Scanner, countMateri int) {
-	for i := 0; i < countMateri; i++ {
-		fmt.Printf("Materi %d: %s\n", i+1, tabelStudy[i].namaMatkul)
-		fmt.Printf("Bab: %s\n", tabelStudy[i].babMateri)
-		fmt.Printf("Isi: %s\n", tabelStudy[i].isiMateri)
-	}
+	tampilMateri(countMateri)
 	fmt.Println("Apakah Anda ingin mengikuti mata kuliah ini? (y/t)")
 	if scanner.Scan() {
 		answer := scanner.Text()
@@ -742,10 +781,7 @@ func materiMurid(scanner *bufio.Scanner, countMateri int) {
 }
 
 func tugasMurid(scanner *bufio.Scanner, countTugas int, countStudent int) {
-	for i := 0; i < countTugas; i++ {
-		fmt.Printf("Tugas %d: %s\n", i+1, tabelTugas[i].judulTugas)
-		fmt.Printf("Soal: %s\n", tabelTugas[i].soal)
-	}
+	tampilTugas(countTugas)
 	fmt.Println("Masukkan nomor tugas yang ingin Anda kerjakan:")
 	var nomorTugas int
 	fmt.Scanln(&nomorTugas)
@@ -834,20 +870,6 @@ func replyForum(scanner *bufio.Scanner) {
 	fmt.Println("Balasan berhasil ditambahkan.")
 }
 
-func tampilkanForum(countForm int) {
-	if countForm == 0 {
-		fmt.Println("Tidak ada forum yang tersedia.")
-		return
-	}
-
-	for i := 0; i < countForm; i++ {
-		fmt.Printf("Forum %d:\n", i+1)
-		fmt.Printf("Judul: %s\n", tabelForm[i].Judul)
-		fmt.Printf("Komentar: %s\n", tabelForm[i].komen)
-		fmt.Println("------------------------------------")
-	}
-}
-
 func tampilDataSiswa(countStudent int, countTugas int) {
 	fmt.Println("Data Siswa:")
 	for i := 0; i < countStudent; i++ {
@@ -857,17 +879,19 @@ func tampilDataSiswa(countStudent int, countTugas int) {
 }
 
 func DataSiswa(countStudent int, countTugas int) {
-	var input int
+	var input, nilai int
 	for {
 		fmt.Println("=========\t Pilihan Menu Guru \t=========")
 		fmt.Println("0. Keluar")
 		fmt.Println("1. Sort nilai quiz")
 		fmt.Println("2. Sort nilai tugas")
 		fmt.Println("3. Tampilkan data siswa")
+		fmt.Println("4. Cari nilai quiz (asc)")
+		fmt.Println("5. Cari nilai quiz (desc)")
 		fmt.Println("======================================")
 		fmt.Print("Pilih Menu: ")
 		fmt.Scanln(&input)
-		if input == 0 || input == 1 || input == 2 || input == 3 {
+		if input == 0 || input == 1 || input == 2 || input == 3 || input == 4 || input == 5 {
 			switch input {
 			case 0:
 				return
@@ -877,6 +901,14 @@ func DataSiswa(countStudent int, countTugas int) {
 				sortNilaiTugas(countStudent)
 			case 3:
 				tampilDataSiswa(countStudent, countTugas)
+			case 4:
+				fmt.Println("Masukkan nilai yang ingin dicari:")
+				fmt.Scanln(&nilai)
+				fmt.Println(searchNilaiQuizAsc(countStudent, nilai))
+			case 5:
+				fmt.Println("Masukkan nilai yang ingin dicari:")
+				fmt.Scanln(&nilai)
+				fmt.Println(searchNilaiQuizDesc(countStudent, nilai))
 			}
 		}
 	}
@@ -939,9 +971,11 @@ func sortNilaiQuiz(countStudent int) {
 			case 1:
 				ascQuiz(countStudent)
 				fmt.Println("Berhasil di sort berdasarkan nilai quiz secara ascending!")
+				return
 			case 2:
 				descQuiz(countStudent)
-				fmt.Println("Berhasil di sort berdasarkan nilai quiz secara ascending!")
+				fmt.Println("Berhasil di sort berdasarkan nilai quiz secara descending!")
+				return
 			}
 		}
 	}
@@ -964,9 +998,11 @@ func sortNilaiTugas(countStudent int) {
 			case 1:
 				ascTugas(countStudent)
 				fmt.Println("Berhasil di sort berdasarkan nilai tugas secara ascending!")
+				return
 			case 2:
 				descTugas(countStudent)
 				fmt.Println("Berhasil di sort berdasarkan nilai tugas secara ascending!")
+				return
 			}
 		}
 	}
@@ -1038,4 +1074,42 @@ func descTugas(countStudent int) {
 		tabelStudent[i] = temp
 		pass++
 	}
+}
+
+func searchNilaiQuizAsc(countStudent int, dicari int) string {
+	var kiri, tengah, kanan int
+	kiri = 0
+	kanan = countStudent - 1
+	for kanan >= kiri {
+		tengah = (kanan + kiri) / 2
+		if tabelStudent[tengah].nilaiQuiz == dicari {
+			return tabelStudent[tengah].nama
+		}
+		if tabelStudent[tengah].nilaiQuiz < dicari {
+			kiri = tengah + 1
+		}
+		if tabelStudent[tengah].nilaiQuiz > dicari {
+			kanan = tengah - 1
+		}
+	}
+	return "Tidak ditemukan"
+}
+
+func searchNilaiQuizDesc(countStudent int, dicari int) string {
+	var kiri, tengah, kanan int
+	kiri = 0
+	kanan = countStudent - 1
+	for kanan >= kiri {
+		tengah = (kanan + kiri) / 2
+		if tabelStudent[tengah].nilaiQuiz == dicari {
+			return tabelStudent[tengah].nama
+		}
+		if tabelStudent[tengah].nilaiQuiz > dicari {
+			kiri = tengah + 1
+		}
+		if tabelStudent[tengah].nilaiQuiz < dicari {
+			kanan = tengah - 1
+		}
+	}
+	return "Tidak ditemukan"
 }
